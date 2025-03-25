@@ -4,6 +4,10 @@ const ctx = canvas.getContext('2d');
 const cloneStampBtn = document.getElementById('cloneStamp');
 const healingBrushBtn = document.getElementById('healingBrush');
 
+let isDrawing = false;
+let startX, startY;
+let cloneSourceX, cloneSourceY;
+
 upload.addEventListener('change', (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -20,11 +24,28 @@ upload.addEventListener('change', (e) => {
 });
 
 cloneStampBtn.addEventListener('click', () => {
-    // Implement Clone Stamp Tool functionality here
-    alert('Clone Stamp Tool selected');
+    canvas.addEventListener('mousedown', startClone);
+    canvas.addEventListener('mousemove', drawClone);
+    canvas.addEventListener('mouseup', stopClone);
 });
 
+function startClone(e) {
+    isDrawing = true;
+    startX = e.offsetX;
+    startY = e.offsetY;
+}
+
+function drawClone(e) {
+    if (!isDrawing) return;
+    cloneSourceX = startX;
+    cloneSourceY = startY;
+    ctx.drawImage(canvas, cloneSourceX, cloneSourceY, 10, 10, e.offsetX, e.offsetY, 10, 10);
+}
+
+function stopClone() {
+    isDrawing = false;
+}
+
 healingBrushBtn.addEventListener('click', () => {
-    // Implement Healing Brush functionality here
     alert('Healing Brush selected');
 });
