@@ -1,26 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Removedor de Marca D'água Simples</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Watermark Remover</title>
+    <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <h1>Removedor de Marca D'água Simples</h1>
-    <p>Carregue uma imagem e use as ferramentas para remover marcas d'água.</p>
-    
-    <input type="file" id="upload" accept="image/*">
-    <div id="tools">
-        <button onclick="cropMode()">Cortar</button>
-        <button onclick="inpaintMode()">Remover Marca D'água</button>
-        <button onclick="eraseMode()">Borracha</button>
-        <button onclick="cloneMode()">Clonar</button>
-        <button onclick="undo()">Desfazer</button>
+    <div class="container">
+        <h1>Watermark Remover</h1>
+        <input type="file" id="upload" accept="image/*">
+        <canvas id="canvas"></canvas>
+        <div class="tools">
+            <button id="cloneStamp">Clone Stamp Tool</button>
+            <button id="healingBrush">Healing Brush</button>
+        </div>
     </div>
-    <canvas id="canvas"></canvas>
-    <button id="downloadBtn" onclick="download()">Baixar Imagem</button>
-    
-    <script src="script.js"></script>
+    <script src="scripts/app.js"></script>
 </body>
 </html>
