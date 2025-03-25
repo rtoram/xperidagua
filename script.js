@@ -22,10 +22,10 @@ function cropMode() {
     alert('Clique e arraste para selecionar a área de corte.');
 }
 
-// Ativar modo de preenchimento
-function fillMode() {
-    mode = 'fill';
-    alert('Clique na marca d\'água para preencher com a cor escolhida.');
+// Ativar modo de desfoque
+function blurMode() {
+    mode = 'blur';
+    alert('Clique e arraste para selecionar a área a ser desfocada.');
 }
 
 // Manipulação do mouse no canvas
@@ -34,12 +34,6 @@ canvas.addEventListener('mousedown', (e) => {
     startX = e.clientX - rect.left;
     startY = e.clientY - rect.top;
     isDragging = true;
-
-    if (mode === 'fill') {
-        const color = document.getElementById('fillColor').value;
-        ctx.fillStyle = color;
-        ctx.fillRect(startX - 15, startY - 15, 30, 30); // Preenche uma área pequena
-    }
 });
 
 canvas.addEventListener('mousemove', (e) => {
@@ -69,17 +63,47 @@ canvas.addEventListener('mouseup', () => {
         const cropWidth = Math.abs(endX - startX);
         const cropHeight = Math.abs(endY - startY);
 
-        // Corta a imagem
+        // Salva a área de corte
         const croppedImage = ctx.getImageData(cropX, cropY, cropWidth, cropHeight);
-        canvas.width = cropWidth;
-        canvas.height = cropHeight;
-        ctx.putImageData(croppedImage, 0, 0);
+        
+        // Redesenha a imagem original
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+
+        // Aplica a área de corte na imagem original
+        ctx.putImageData(croppedImage, cropX, cropY);
 
         // Atualiza a imagem original para o recorte
         img.src = canvas.toDataURL();
+    } else if (isDragging && mode === 'blur') {
+        isDragging = false;
+
+        // Calcula a área de desfoque
+        const blurX = Math.min(startX, endX);
+        const blurY = Math.min(startY, endY);
+        const blurWidth = Math.abs(endX - startX);
+        const blurHeight = Math.abs(endY - startY);
+
+        // Aplica o desfoque na área selecionada
+        blurArea(blurX, blurY, blurWidth, blurHeight);
     }
     isDragging = false;
 });
+
+// Função de desfoque
+function blurArea(x, y, width, height) {
+    const imageData = ctx.getImageData(x, y, width, height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        data[i] = avg;     // Red
+        data[i + 1] = avg; // Green
+        data[i + 2] = avg; // Blue
+    }
+
+    ctx.putImageData(imageData, x, y);
+}
 
 // Função de download
 function download() {
