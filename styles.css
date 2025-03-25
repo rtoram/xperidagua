@@ -1,25 +1,52 @@
-canvas.addEventListener('mouseup', () => {
-    if (isDragging && mode === 'crop') {
-        isDragging = false;
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
 
-        // Calcula a área de corte
-        const cropX = Math.min(startX, endX);
-        const cropY = Math.min(startY, endY);
-        const cropWidth = Math.abs(endX - startX);
-        const cropHeight = Math.abs(endY - startY);
+h1 {
+    color: #333;
+}
 
-        // Salva a área de corte
-        const croppedImage = ctx.getImageData(cropX, cropY, cropWidth, cropHeight);
-        
-        // Redesenha a imagem original
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
+p {
+    color: #666;
+    margin-bottom: 20px;
+}
 
-        // Aplica a área de corte na imagem original
-        ctx.putImageData(croppedImage, cropX, cropY);
+#upload {
+    margin: 10px 0;
+}
 
-        // Atualiza a imagem original para o recorte
-        img.src = canvas.toDataURL();
-    }
-    isDragging = false;
-});
+#tools {
+    margin: 15px 0;
+}
+
+button {
+    padding: 8px 16px;
+    margin: 0 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#canvas {
+    border: 2px solid #333;
+    max-width: 100%;
+    margin-top: 20px;
+}
+
+#downloadBtn {
+    margin-top: 20px;
+    background-color: #28a745;
+}
+
+#downloadBtn:hover {
+    background-color: #218838;
+}
