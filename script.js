@@ -4,6 +4,7 @@ let img = new Image();
 let mode = '';
 let isDragging = false;
 let startX, startY, endX, endY;
+let history = [];
 
 // Upload da imagem
 document.getElementById('upload').addEventListener('change', function(e) {
@@ -13,8 +14,26 @@ document.getElementById('upload').addEventListener('change', function(e) {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
+        saveState();
     };
 });
+
+function saveState() {
+    history.push(canvas.toDataURL());
+}
+
+function undo() {
+    if (history.length > 1) {
+        history.pop();
+        const imgData = history[history.length - 1];
+        const img = new Image();
+        img.src = imgData;
+        img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        };
+    }
+}
 
 // Ativar modo de corte
 function cropMode() {
@@ -22,22 +41,40 @@ function cropMode() {
     alert('Clique e arraste para selecionar a área de corte.');
 }
 
-// Ativar modo de desfoque
-function blurMode() {
-    mode = 'blur';
-    alert('Clique e arraste para selecionar a área a ser desfocada.');
+// Ativar modo de remoção de marca d'água
+function inpaintMode() {
+    mode = 'inpaint';
+    alert('Clique e arraste para selecionar a área da marca d\'água.');
 }
 
-// Manipulação do mouse no canvas
+// Ativar modo de borracha
+function eraseMode() {
+    mode = 'erase';
+    alert('Clique e arraste para apagar a marca d\'água.');
+}
+
+// Ativar modo de clonar
+function cloneMode() {
+    mode = 'clone';
+    alert('Clique para selecionar a área a ser clonada e arraste para aplicar.');
+}
+
 canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     startX = e.clientX - rect.left;
     startY = e.clientY - rect.top;
     isDragging = true;
+
+    if (mode === 'erase') {
+        erase(startX, startY);
+    } else if (mode === 'clone') {
+        cloneX = startX;
+        cloneY = startY;
+    }
 });
 
 canvas.addEventListener('mousemove', (e) => {
-    if (isDragging && mode === 'crop') {
+    if (isDragging && (mode === 'crop' || mode === 'inpaint')) {
         const rect = canvas.getBoundingClientRect();
         endX = e.clientX - rect.left;
         endY = e.clientY - rect.top;
@@ -50,6 +87,16 @@ canvas.addEventListener('mousemove', (e) => {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+    } else if (isDragging && mode === 'erase') {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        erase(x, y);
+    } else if (isDragging && mode === 'clone') {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        clone(cloneX, cloneY, x, y);
     }
 });
 
@@ -75,34 +122,59 @@ canvas.addEventListener('mouseup', () => {
 
         // Atualiza a imagem original para o recorte
         img.src = canvas.toDataURL();
-    } else if (isDragging && mode === 'blur') {
+        saveState();
+    } else if (isDragging && mode === 'inpaint') {
         isDragging = false;
 
-        // Calcula a área de desfoque
-        const blurX = Math.min(startX, endX);
-        const blurY = Math.min(startY, endY);
-        const blurWidth = Math.abs(endX - startX);
-        const blurHeight = Math.abs(endY - startY);
+        // Calcula a área da marca d'água
+        const inpaintX = Math.min(startX, endX);
+        const inpaintY = Math.min(startY, endY);
+        const inpaintWidth = Math.abs(endX - startX);
+        const inpaintHeight = Math.abs(endY - startY);
 
-        // Aplica o desfoque na área selecionada
-        blurArea(blurX, blurY, blurWidth, blurHeight);
+        // Aplica a técnica de inpainting na área selecionada
+        inpaintArea(inpaintX, inpaintY, inpaintWidth, inpaintHeight);
+        saveState();
+    } else if (isDragging && mode === 'erase') {
+        isDragging = false;
+        saveState();
+    } else if (isDragging && mode === 'clone') {
+        isDragging = false;
+        saveState();
     }
-    isDragging = false;
 });
 
-// Função de desfoque
-function blurArea(x, y, width, height) {
+// Função de inpainting
+function inpaintArea(x, y, width, height) {
     const imageData = ctx.getImageData(x, y, width, height);
     const data = imageData.data;
 
+    // Algoritmo simples de inpainting
     for (let i = 0; i < data.length; i += 4) {
-        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-        data[i] = avg;     // Red
-        data[i + 1] = avg; // Green
-        data[i + 2] = avg; // Blue
+        const avg = (getPixel(data, i - 4) + getPixel(data, i + 4) + getPixel(data, i - width * 4) + getPixel(data, i + width * 4)) / 4;
+        setPixel(data, i, avg);
     }
 
     ctx.putImageData(imageData, x, y);
+}
+
+function getPixel(data, index) {
+    return (data[index] + data[index + 1] + data[index + 2]) / 3;
+}
+
+function setPixel(data, index, value) {
+    data[index] = value;
+    data[index + 1] = value;
+    data[index + 2] = value;
+}
+
+function erase(x, y) {
+    ctx.clearRect(x - 10, y - 10, 20, 20);
+}
+
+function clone(sourceX, sourceY, destX, destY) {
+    const imageData = ctx.getImageData(sourceX, sourceY, 20, 20);
+    ctx.putImageData(imageData, destX - 10, destY - 10);
 }
 
 // Função de download
