@@ -1,24 +1,2 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Removedor de Marca D'água Simples</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <h1>Removedor de Marca D'água Simples</h1>
-    <p>Carregue uma imagem e use as ferramentas para remover marcas d'água.</p>
-    
-    <input type="file" id="upload" accept="image/*">
-    <div id="tools">
-        <button onclick="cropMode()">Cortar</button>
-        <button onclick="fillMode()">Preencher</button>
-        <input type="color" id="fillColor" value="#ffffff" title="Escolha a cor de preenchimento">
-    </div>
-    <canvas id="canvas"></canvas>
-    <button id="downloadBtn" onclick="download()">Baixar Imagem</button>
-    
-    <script src="script.js"></script>
-</body>
-</html>
+<input type="range" id="intensity" min="0" max="100" value="100">
+<label for="intensity">Intensidade</label>
