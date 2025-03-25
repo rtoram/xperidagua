@@ -1,52 +1,40 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
     text-align: center;
+    background: #fff;
     padding: 20px;
-    background-color: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    color: #333;
+#canvas {
+    margin-top: 20px;
+    border: 1px solid #ccc;
 }
 
-p {
-    color: #666;
-    margin-bottom: 20px;
-}
-
-#upload {
-    margin: 10px 0;
-}
-
-#tools {
-    margin: 15px 0;
+.tools {
+    margin-top: 20px;
 }
 
 button {
-    padding: 8px 16px;
-    margin: 0 5px;
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
     background-color: #007bff;
     color: white;
-    border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
 button:hover {
     background-color: #0056b3;
-}
-
-#canvas {
-    border: 2px solid #333;
-    max-width: 100%;
-    margin-top: 20px;
-}
-
-#downloadBtn {
-    margin-top: 20px;
-    background-color: #28a745;
-}
-
-#downloadBtn:hover {
-    background-color: #218838;
 }
